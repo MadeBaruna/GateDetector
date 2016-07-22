@@ -1,0 +1,22 @@
+plugins {
+    id 'org.spongepowered.plugin' version '0.6'
+    id "com.qixalite.spongestart" version "1.4.6"
+    id "java"
+}
+
+group = 'me.baruna.gatedetector'
+version = '1.0-SNAPSHOT'
+description = 'A plugin to make a gate that detects player inventory'
+
+spongestart{
+    eula true
+
+    spongeVanillaBuild 'LATEST'
+    spongeForgeBuild 'LATEST'
+    forgeServerFolder 'run/forge'
+    vanillaServerFolder 'run/vanilla'
+}
+
+dependencies {
+    compile 'org.spongepowered:spongeapi:5.0.0-SNAPSHOT'
+}
