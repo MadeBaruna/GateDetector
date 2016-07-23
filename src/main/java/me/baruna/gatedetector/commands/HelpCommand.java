@@ -24,40 +24,24 @@
 
 package me.baruna.gatedetector.commands;
 
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
-import java.util.*;
-
-public class CommandDataHolder {
-    static Map<Player, Collection<ItemType>> itemsData = new HashMap<Player, Collection<ItemType>>();
-    static List<Player> infoData = new ArrayList<Player>();
-
-    public static Collection<ItemType> getData(Player player) {
-        return itemsData.get(player);
-    }
-
-    public static void addItemsDataHolder(Player player, Collection<ItemType> items) {
-        itemsData.put(player, items);
-    }
-
-    public static void removeItemDataHolder(Player player) {
-        itemsData.remove(player);
-    }
-
-    public static boolean isItemDataExists(Player player) {
-        return itemsData.containsKey(player);
-    }
-
-    public static void addInfoDataHolder(Player player) {
-        infoData.add(player);
-    }
-
-    public static void removeInfoDataHolder(Player player) {
-        infoData.remove(player);
-    }
-
-    public static boolean isInfoDataExists(Player player) {
-        return infoData.contains(player);
+public class HelpCommand implements CommandExecutor {
+    @Override
+    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+        src.sendMessage(Text.of(TextColors.GREEN,  "GateDetector Commands ============================="));
+        src.sendMessage(Text.of(TextColors.GREEN,  "/gd", TextColors.AQUA, " /gatedetector command alias"));
+        src.sendMessage(Text.of(TextColors.GREEN,  "/gd help", TextColors.AQUA, " show this information"));
+        src.sendMessage(Text.of(TextColors.GREEN,  "/gd info",
+                TextColors.AQUA, " show a gate detector information"));
+        src.sendMessage(Text.of(TextColors.GREEN,  "/gd add <item id>",
+                TextColors.AQUA, " add item(s) to a gate detector detection list"));
+        return CommandResult.success();
     }
 }

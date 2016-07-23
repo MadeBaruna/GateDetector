@@ -36,6 +36,20 @@ public class Commands {
         Sponge.getCommandManager().register(plugin, mainCmd, "gatedetector", "gd");
     }
 
+    // /gatedetector help
+    CommandSpec helpCmd = CommandSpec.builder()
+            .description(Text.of("Check a gate detector information"))
+            .permission("gatedetector")
+            .executor(new HelpCommand())
+            .build();
+
+    // /gatedetector info
+    CommandSpec infoCmd = CommandSpec.builder()
+            .description(Text.of("Check a gate detector information"))
+            .permission("gatedetector.info")
+            .executor(new InfoCommand())
+            .build();
+
     // /gatedetector add
     CommandSpec addCmd = CommandSpec.builder()
             .description(Text.of("AddCommand item to gate detection list"))
@@ -53,5 +67,8 @@ public class Commands {
             .description(Text.of("Gate Detector Main Command"))
             .permission("gatedetector")
             .child(addCmd, "add")
+            .child(infoCmd, "info")
+            .child(helpCmd, "help")
+            .executor(new GateDetectorCommand())
             .build();
 }

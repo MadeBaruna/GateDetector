@@ -58,6 +58,10 @@ public class GateDetector {
 
     private Config config;
 
+    public Game getGame() {
+        return game;
+    }
+
     public Logger getLogger() {
         return this.logger;
     }

@@ -43,7 +43,7 @@ public class AddCommand implements CommandExecutor {
         if(src instanceof Player) {
             Player player = (Player) src;
             Collection<ItemType> items = args.<ItemType>getAll(Text.of("Item Type"));
-            CommandDataHolder.addData(player, items);
+            CommandDataHolder.addItemsDataHolder(player, items);
             ((Player) src).sendMessage(Text.of(TextColors.BLUE, Localization.getText("addItems")));
         } else {
             src.sendMessage(Text.of(TextColors.RED, Localization.getText("notPlayer")));

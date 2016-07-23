@@ -36,17 +36,15 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.block.CollideBlockEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
-import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.event.filter.cause.Root;
-import org.spongepowered.api.event.filter.type.Exclude;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class RightClickBlockListener {
     private final GateDetector plugin;
@@ -56,13 +54,8 @@ public class RightClickBlockListener {
     }
 
     @Listener
-    @Exclude({CollideBlockEvent.class, MoveEntityEvent.class})
     public void onRightClickBlock(InteractBlockEvent.Secondary event, @Root Player player) {
         if(event.getTargetBlock().getState().getType() != BlockTypes.STANDING_SIGN) {
-            return;
-        }
-
-        if(!CommandDataHolder.isExists(player)) {
             return;
         }
 
@@ -73,6 +66,16 @@ public class RightClickBlockListener {
             return;
         }
 
+        if(CommandDataHolder.isItemDataExists(player)) {
+            add(sign, player);
+        }
+
+        if(CommandDataHolder.isInfoDataExists(player)) {
+            info(sign, player);
+        }
+    }
+
+    private void add(SignGate sign, Player player) {
         List<ItemType> items = sign.getItems();
         List<ItemType> newItems = new ArrayList<ItemType>(CommandDataHolder.getData(player));
         items.addAll(newItems);
@@ -94,6 +97,28 @@ public class RightClickBlockListener {
         Config.getGates().save();
 
         player.sendMessage(Text.of(TextColors.GREEN, Localization.getText("itemsAdded")));
-        CommandDataHolder.removeData(player);
+        CommandDataHolder.removeItemDataHolder(player);
+    }
+
+    private void info(SignGate sign, Player player) {
+        List<ItemType> items = sign.getItems();
+        Optional<Player> playerCreator = plugin.getGame().getServer().getPlayer(sign.getPlayerUUID());
+
+        if(playerCreator.isPresent()) {
+            player.sendMessage(
+                    Text.of(TextColors.GREEN, "Gate Creator: ",
+                            TextColors.AQUA, playerCreator.get().getName())
+            );
+        }
+        player.sendMessage(Text.of(TextColors.GREEN, "Gate Type: ", TextColors.AQUA, sign.getType()));
+        Text.Builder itemsList = Text.builder()
+                .append(Text.of(TextColors.GREEN, "Detection list: ")).
+                color(TextColors.AQUA);
+        for(ItemType i : items) {
+            itemsList.append(Text.of(i.getName(), " "));
+        }
+        player.sendMessage(itemsList.build());
+
+        CommandDataHolder.removeInfoDataHolder(player);
     }
 }
