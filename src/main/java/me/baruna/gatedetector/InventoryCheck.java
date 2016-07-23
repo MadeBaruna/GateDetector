@@ -27,8 +27,10 @@ package me.baruna.gatedetector;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
@@ -57,24 +59,29 @@ public class InventoryCheck {
         return slots;
     }
 
-    public static boolean checkInventory(Inventory inventory, SignGate sign) {
+    public static boolean checkInventory(Player player, SignGate sign) {
+        Inventory inventory = player.getInventory();
         Iterable<Slot> slots = getSlots(inventory);
         List<Slot> slotsList = Lists.newArrayList(slots);
         List<ItemType> itemDetectionList = sign.getItems();
+
+        Optional<ItemStack> offHandItemOpt = player.getItemInHand(HandTypes.OFF_HAND);
+        ItemType offHandItem = ItemTypes.NONE;
+        if(offHandItemOpt.isPresent()) {
+            offHandItem = offHandItemOpt.get().getItem().getType();
+        }
 
         for (int i = 0; i < slotsList.size(); i++) {
             Optional<ItemStack> optStack = slotsList.get(i).peek();
             if (optStack.isPresent()) {
                 {
-                    if(itemDetectionList.contains(optStack.get().getItem())) {
+                    ItemType type = optStack.get().getItem().getType();
+                    if(itemDetectionList.contains(type) || itemDetectionList.contains(offHandItem)) {
                         return true;
                     }
                 }
             }
         }
-
-        //TODO check off-hand item
-        //plugin.getLogger().info(player.getItemInHand(HandTypes.OFF_HAND).get().getItem().getType().getName());
 
         return false;
     }
@@ -83,6 +90,12 @@ public class InventoryCheck {
         Iterable<Slot> slots = player.getInventory().slots();
         List<Slot> slotsList = Lists.newArrayList(slots);
 
+        Optional<ItemStack> offHandItemOpt = player.getItemInHand(HandTypes.OFF_HAND);
+        ItemStack offHandItem = null;
+        if(offHandItemOpt.isPresent()) {
+            offHandItem = offHandItemOpt.get();
+        }
+
         for (int i = 0; i < slotsList.size(); i++) {
             Optional<ItemStack> optStack = slotsList.get(i).peek();
             if (optStack.isPresent()) {
@@ -90,6 +103,12 @@ public class InventoryCheck {
                 if(items.contains(optStack.get().getItem())) {
                     Inventory item = player.getInventory().query(optStack.get());
                     item.poll();
+                }
+
+                if(offHandItem != null) {
+                    if(items.contains(offHandItem.getItem())) {
+                        player.setItemInHand(HandTypes.OFF_HAND, null);
+                    }
                 }
             }
         }

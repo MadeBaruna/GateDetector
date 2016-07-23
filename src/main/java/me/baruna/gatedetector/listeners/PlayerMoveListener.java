@@ -101,7 +101,7 @@ public class PlayerMoveListener {
             }
 
             if(toLoc.equals(signBlockPos)) {
-                if(InventoryCheck.checkInventory(player.getInventory(), sign)) {
+                if(InventoryCheck.checkInventory(player, sign)) {
                     action(sign, event, player);
                 }
             }
