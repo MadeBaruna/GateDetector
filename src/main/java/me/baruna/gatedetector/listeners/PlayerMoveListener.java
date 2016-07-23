@@ -33,19 +33,28 @@ import me.baruna.gatedetector.config.Config;
 import me.baruna.gatedetector.config.ConfigFile;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.entity.HealthData;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.NamedCause;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.scheduler.Scheduler;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.extent.Extent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public class PlayerMoveListener {
@@ -151,6 +160,29 @@ public class PlayerMoveListener {
                 player.offer(healthData);
             case "REMOVE":
                 InventoryCheck.removeItems(player, sign.getItems());
+                break;
+            case "REDSTONE":
+                Location aboveSignLoc = sign.getLocation().add(0, 1, 0);
+                BlockType aboveSign = aboveSignLoc.getBlock().getType();
+                if(aboveSign == BlockTypes.AIR) {
+                    aboveSignLoc.setBlockType(BlockTypes.REDSTONE_BLOCK);
+                    Scheduler scheduler = Sponge.getScheduler();
+                    Task.Builder taskBuilder = scheduler.createTaskBuilder();
+                    Task task = taskBuilder.execute(new Runnable() {
+                        public void run() {
+                            aboveSignLoc.setBlockType(BlockTypes.AIR);
+                        }
+                    }).delay(1, TimeUnit.SECONDS).submit(plugin);
+                }
+                break;
+            case "LIGHTNING":
+                Extent extent = sign.getLocation().getExtent();
+                Optional<Entity> lightning =
+                        extent.createEntity(EntityTypes.LIGHTNING, player.getLocation().getPosition());
+                if(lightning.isPresent()) {
+                    extent.spawnEntity(lightning.get(),
+                            Cause.of(NamedCause.source(SpawnCause.builder().type(SpawnTypes.CUSTOM).build())));
+                }
                 break;
             default:
                 event.setCancelled(true);

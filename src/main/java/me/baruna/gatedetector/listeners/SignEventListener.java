@@ -53,7 +53,9 @@ public class SignEventListener {
             "BLOCK",
             "PITHOLE",
             "KILL",
-            "REMOVE"
+            "REMOVE",
+            "REDSTONE",
+            "LIGHTNING"
     );
 
     public SignEventListener(GateDetector plugin) {
